@@ -117,6 +117,10 @@ def main():
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
 
+        # Apply repair function to offspring, to keep user's initial rated movies static
+        for child in offspring:
+            mask_matrix(child, user)
+
         # Evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
         fitnesses = map(toolbox.evaluate, invalid_ind)
