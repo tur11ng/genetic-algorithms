@@ -89,7 +89,8 @@ def main():
     # Variable keeping track of the number of generations
     g = 0
 
-    elit_history.append((g, max(fits)))
+    elite_history = [(g, max(fits))]
+    # elit = tools.selBest(pop, 1)[0]
 
     # Begin the evolution
     while max(fits) < MAX_FIT and g < MAX_GENERATIONS:
@@ -136,7 +137,7 @@ def main():
         # Gather all the fitnesses in one list and print the stats
         fits = [ind.fitness.values[0] for ind in pop]
 
-        elit_history.append((g, max(fits)))
+        elite_history.append((g, max(fits)))
 
         length = len(pop)
         mean = sum(fits) / length
@@ -150,10 +151,10 @@ def main():
 
     print("-- End of (successful) evolution --")
 
-    best_ind = tools.selBest(pop, 1)[0]
-    print("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
+    elite = tools.selBest(pop, 1)[0]
+    print("Best individual is %s, %s" % (elite, elite.fitness.values))
 
-    show_plot(elit_history, 'Generations', 'Evaluation', 'Title', '', save=False)
+    show_plot(elite_history, 'Generations', 'Evaluation', 'Title', '', save=False)
 
 
 if __name__ == "__main__":
