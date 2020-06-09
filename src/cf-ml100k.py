@@ -20,7 +20,7 @@ MAX_FIT = 1
 
 
 # evaluation function based on pearson correlation
-def evaluation_function_pearson(individual, neighbors, metric=lambda x, y: abs(pearsonr(x, y)[0])):
+def evaluation_function_pearson(individual, neighbors, metric=lambda x, y: (pearsonr(x, y)[0]+1)/2):
     distances_from_every_neighbor = []
     for neighbor in neighbors:
         distances_from_every_neighbor.append(metric(neighbor, individual))
