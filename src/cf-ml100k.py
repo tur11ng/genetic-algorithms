@@ -63,7 +63,7 @@ def main():
     # toolbox.register("mate", tools.cxOrdered)
     # toolbox.register("mate", tools.cxPartialyMatched)
 
-    # register a mutation operator TODO 5 or 6?
+    # TODO add second mutation probability
     toolbox.register("mutate", tools.mutUniformInt, low=1, up=5, indpb=P_MUTATION)
 
     # register selection operator
@@ -81,7 +81,8 @@ def main():
 
     print("  Evaluated %i individuals" % len(pop))
 
-    # Extracting all the fitnesses of
+    # Extracting all the fitnesses of the population
+    # .values[0] is because fitness function returns a tuple
     fits = [ind.fitness.values[0] for ind in pop]
 
     # Variable keeping track of the number of generations
@@ -99,7 +100,7 @@ def main():
         # Clone the selected individuals
         offspring = list(map(toolbox.clone, offspring))
 
-        # Apply crossover and mutation on the offspring
+        # Apply crossover
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
             # cross two individuals with probability P_CROSSOVER
             if random.random() < P_CROSSOVER:
@@ -110,8 +111,8 @@ def main():
                 del child1.fitness.values
                 del child2.fitness.values
 
+        # Apply mutation on the offsprings
         for mutant in offspring:
-            # mutate an individual with probability P_MUTATION
             if random.random() < P_MUTATION:
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
