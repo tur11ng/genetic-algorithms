@@ -33,6 +33,7 @@ def main():
     nearest_neighbors = get_nearest_neighbors(users_mean_filled,
                                               USER_N
                                               , 10)
+    user = users[USER_N].tolist()
     user = users[0].tolist()
 
     # users = users.tolist()
@@ -70,13 +71,13 @@ def main():
     # toolbox.register("select", tools.selRoulette)
 
     pop = toolbox.population(n=POPULATION_SIZE)
-    print(pop)
+
     print("Start of evolution")
 
     # Evaluate the entire population
     fitnesses = list(map(toolbox.evaluate, pop))
-    for individual, fit in zip(pop, fitnesses):
-        individual.fitness.values = fit
+    for ind, fit in zip(pop, fitnesses):
+        ind.fitness.values = fit
 
     print("  Evaluated %i individuals" % len(pop))
 
