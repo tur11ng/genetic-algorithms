@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import pearsonr
 
@@ -42,8 +43,14 @@ def mask_matrix(matrix: np.ndarray, mask_matrix: np.ndarray):
     matrix = np.copy(matrix)
     mask_matrix = np.copy(mask_matrix)
 
-    nan_mask = np.isnan(mask_matrix)
-    not_nan_mask_matrix = mask_matrix[~nan_mask]
+def show_plot(points, x_label, y_label, title, legend, save=True):
+    plt.plot([point[0] for point in points], [point[1] for point in points])
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
 
-    matrix[~nan_mask] = not_nan_mask_matrix
-    return matrix
+    plt.title("{}".format(title))
+    plt.legend(legend)
+    plt.show()
+    if save:
+        plt.savefig("./images/{}.png".format(title), bbox_inches='tight')
+    plt.close()
