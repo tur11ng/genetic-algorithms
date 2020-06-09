@@ -11,11 +11,12 @@ from src.parser import *
 random.seed(64)
 toolbox = base.Toolbox()
 
-USER_N = 5
-POPULATION_SIZE = 20
+USER_N = 10
+POPULATION_SIZE = 300
 P_MUTATION = 0.9
 P_CROSSOVER = 0.05
-MAX_GENERATIONS = 50
+MAX_GENERATIONS = 20
+MAX_FIT = 1
 
 
 # evaluation function based on pearson correlation
@@ -91,7 +92,7 @@ def main():
     elit_history.append((g, max(fits)))
 
     # Begin the evolution
-    while max(fits) < 100 and g < MAX_GENERATIONS:
+    while max(fits) < MAX_FIT and g < MAX_GENERATIONS:
         g += 1
         print("-- Generation %i --" % g)
 
