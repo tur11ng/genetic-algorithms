@@ -34,7 +34,7 @@ def main():
                                               USER_N
                                               , 10)
     user = users[USER_N].tolist()
-    user = users[0].tolist()
+    elit_history = []
 
     # users = users.tolist()
     # users_mean_filled = users_mean_filled.tolist()
@@ -87,6 +87,8 @@ def main():
     # Variable keeping track of the number of generations
     g = 0
 
+    elit_history.append((g, max(fits)))
+
     # Begin the evolution
     while max(fits) < 100 and g < MAX_GENERATIONS:
         g += 1
@@ -128,6 +130,8 @@ def main():
         # Gather all the fitnesses in one list and print the stats
         fits = [ind.fitness.values[0] for ind in pop]
 
+        elit_history.append((g, max(fits)))
+
         length = len(pop)
         mean = sum(fits) / length
         sum2 = sum(x * x for x in fits)
@@ -142,6 +146,8 @@ def main():
 
     best_ind = tools.selBest(pop, 1)[0]
     print("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
+
+    show_plot(elit_history, 'Generations', 'Evaluation', 'Title', '', save=False)
 
 
 if __name__ == "__main__":
