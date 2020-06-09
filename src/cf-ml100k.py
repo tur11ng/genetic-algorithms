@@ -19,13 +19,10 @@ MAX_GENERATIONS = 50
 
 
 # evaluation function based on pearson correlation
-def evaluation_function_pearson(individual, neighbors):
+def evaluation_function_pearson(individual, neighbors, metric=lambda x, y: abs(pearsonr(x, y)[0])):
     distances_from_every_neighbor = []
     for neighbor in neighbors:
-        # distances_from_every_neighbor.append(cosine(neighbor, individual)+1)
-        # distances_from_every_neighbor.append(cdist(neighbor, individual, metric='cityblock'))  # Manhattan distance
-        distances_from_every_neighbor.append(abs(pearsonr(neighbor, individual)[0]))  # Pearson distance returns (
-        # correlation coefficient, p-value)
+        distances_from_every_neighbor.append(metric(neighbor, individual))
         avg = np.mean(distances_from_every_neighbor)
     return (avg,)
 
