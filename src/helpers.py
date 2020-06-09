@@ -1,3 +1,5 @@
+import math
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import pearsonr
@@ -39,9 +41,20 @@ def get_nearest_neighbors(individuals: np.ndarray, individual: int, n_neighbors:
     return individuals[sorted_distances_ind]
 
 
-def mask_matrix(matrix: np.ndarray, mask_matrix: np.ndarray):
-    matrix = np.copy(matrix)
-    mask_matrix = np.copy(mask_matrix)
+# def mask_matrix(matrix: np.ndarray, mask_matrix: np.ndarray):
+#     matrix = np.copy(matrix)
+#     mask_matrix = np.copy(mask_matrix)
+#
+#     matrix[~np.isnan(mask_matrix)] = mask_matrix[~np.isnan(mask_matrix)]
+#     return matrix
+
+
+def mask_matrix(matrix: list, mask: list):
+    for i in range(len(mask)):
+        if not math.isnan(mask[i]):
+            matrix[i] = mask[i]
+    return
+
 
 def show_plot(points, x_label, y_label, title, legend, save=True):
     plt.plot([point[0] for point in points], [point[1] for point in points])
