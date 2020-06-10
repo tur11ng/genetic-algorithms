@@ -78,12 +78,9 @@ def main():
         for child in offspring:
             repair_individual(child, user)
 
-        invalid_individuals = [individual for individual in offspring if not individual.fitness.valid]
-        invalid_individuals_fits = list(map(toolbox.evaluate, invalid_individuals))
-        for ind, fit in zip(invalid_individuals, invalid_individuals_fits):
-            ind.fitness.values = fit
-
-        print("  Reevaluated %i offsprings with invalid fitness" % len(invalid_individuals))
+        fits = list(map(toolbox.evaluate, offspring))
+        for child, fit in zip(offspring, fits):
+            child.fitness.values = fit
 
         pop[:] = offspring
 
