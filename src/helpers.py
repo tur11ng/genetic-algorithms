@@ -30,7 +30,7 @@ def replace_nan_with_mean_columns(matrix: np.ndarray) -> np.ndarray:
 
 
 def get_nearest_neighbors(individuals: np.ndarray, individual: int, n_neighbors: int,
-                          metric=lambda x, y: abs(pearsonr(x, y)[0])) -> np.ndarray:
+                          metric=lambda x, y: (pearsonr(x, y)[0]+1)/2) -> np.ndarray:
     individuals = np.copy(individuals)
     individual = np.copy(individuals[individual])
     distances = []
