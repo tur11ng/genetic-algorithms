@@ -24,19 +24,18 @@ class TestHelpers(unittest.TestCase):
     def test_get_nearest_neighbors(self):
         pass
 
-    def test_mask_matrix(self):
-        provided = np.array([[1, 2, 3, 4],
-                             [10, 20, 30, 40],
-                             [5, 10, 15, 20]])
-        provided_mask = np.array([[100, 200, float('NaN'), float('NaN')],
-                                  [float('NaN'), float('NaN'), float('NaN'), float('NaN')],
-                                  [50, 100, float('NaN'), float('NaN')]])
+    def test_repair_individual(self):
+        provided = [1, 2, 3, 4]
+        provided_mask = [100, 200, float('NaN'), float('NaN')]
 
-        expected = np.array([[100, 200, 3, 4],
-                             [10, 20, 30, 40],
-                             [50, 100, 15, 20]])
+        expected = [100, 200, 3, 4]
+        repair_individual(provided, provided_mask)
+        assert_array_equal(provided, expected)
 
-        assert_array_equal(mask_matrix(provided, provided_mask), expected)
+    def test_evaluation_function(self):
+        self.assertEqual(evaluation_function(np.arange(10), [np.arange(10)]), (1,))
+        self.assertEqual(evaluation_function(np.arange(10), [np.arange(10)[::-1]]), (0,))
+        self.assertEqual(evaluation_function(np.arange(10), [np.arange(10)[::-1], np.arange(10)]), (0.5,))  # (-1 +1 / 2)
 
 
 if __name__ == '__main__':

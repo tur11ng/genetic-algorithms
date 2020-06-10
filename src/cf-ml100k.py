@@ -3,30 +3,18 @@ from functools import partial
 
 from deap import base, creator
 from deap import tools
-from scipy.stats import pearsonr
 
 from src.helpers import *
 from src.parser import *
 
-random.seed(64)
 toolbox = base.Toolbox()
 
-USER_N = 10
+USER_N = 11
 POPULATION_SIZE = 300
-P_MUTATION = 0.05
-P_CROSSOVER = 0.9
+P_MUTATION = 0.3
+P_CROSSOVER = 0.8
 MAX_GENERATIONS = 20
 MAX_FIT = 1
-
-
-# evaluation function based on pearson correlation
-def evaluation_function_pearson(individual, neighbors, metric=lambda x, y: (pearsonr(x, y)[0]+1)/2):
-    distances_from_every_neighbor = []
-    for neighbor in neighbors:
-        distances_from_every_neighbor.append(metric(neighbor, individual))
-        avg = np.mean(distances_from_every_neighbor)
-    return (avg,)
-
 
 def main():
     users = parse_ml100k()
@@ -35,126 +23,85 @@ def main():
                                               USER_N
                                               , 10)
     user = users[USER_N].tolist()
-    elit_history = []
-
-    # users = users.tolist()
-    # users_mean_filled = users_mean_filled.tolist()
-    nearest_neighbors = nearest_neighbors.tolist()
 
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", list, fitness=creator.FitnessMax)
 
-    # register individual
     generate_individual = partial(replace_nan_with_random, user)
     toolbox.register("individual", lambda ind, ind_gen: ind(ind_gen().tolist()), creator.Individual,
                      generate_individual)
-
-    # define the population to be a list of individuals
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
-    # register the goal / fitness function
-    evaluation_function = partial(evaluation_function_pearson, neighbors=nearest_neighbors)
-
-    toolbox.register("evaluate", evaluation_function)
-
-    # register the crossover operator
+    evaluate_individual = partial(evaluation_function, neighbors=nearest_neighbors)
+    toolbox.register("evaluate", evaluate_individual)
     toolbox.register("mate", tools.cxTwoPoint)
-    # toolbox.register("mate", tools.cxOnePoint)
-    # toolbox.register("mate", tools.cxUniform)
-    # toolbox.register("mate", tools.cxOrdered)
-    # toolbox.register("mate", tools.cxPartialyMatched)
-
-    # TODO add second mutation probability
-    toolbox.register("mutate", tools.mutUniformInt, low=1, up=5, indpb=P_MUTATION)
-
-    # register selection operator
-    toolbox.register("select", tools.selTournament, tournsize=3)
-    # toolbox.register("select", tools.selRoulette)
+    toolbox.register("mutate", tools.mutUniformInt, low=1, up=5, indpb=0.5)
+    toolbox.register("select", tools.selTournament, tournsize=4)
 
     pop = toolbox.population(n=POPULATION_SIZE)
 
     print("Start of evolution")
 
     # Evaluate the entire population
-    fitnesses = list(map(toolbox.evaluate, pop))
-    for ind, fit in zip(pop, fitnesses):
+    fits = list(map(toolbox.evaluate, pop))
+    for ind, fit in zip(pop, fits):
         ind.fitness.values = fit
 
     print("  Evaluated %i individuals" % len(pop))
 
-    # Extracting all the fitnesses of the population
-    # .values[0] is because fitness function returns a tuple
     fits = [ind.fitness.values[0] for ind in pop]
-
-    # Variable keeping track of the number of generations
     g = 0
 
     elite_history = [(g, max(fits))]
-    # elit = tools.selBest(pop, 1)[0]
+    mean_history = [(g, np.mean(fits))]
 
-    # Begin the evolution
     while max(fits) < MAX_FIT and g < MAX_GENERATIONS:
         g += 1
+
         print("-- Generation %i --" % g)
 
-        # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
-        # Clone the selected individuals
         offspring = list(map(toolbox.clone, offspring))
 
-        # Apply crossover
         for child1, child2 in zip(offspring[::2], offspring[1::2]):
-            # cross two individuals with probability P_CROSSOVER
             if random.random() < P_CROSSOVER:
                 toolbox.mate(child1, child2)
 
-                # fitness values of the children
-                # must be recalculated later
                 del child1.fitness.values
                 del child2.fitness.values
 
-        # Apply mutation on the offsprings
         for mutant in offspring:
             if random.random() < P_MUTATION:
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
 
-        # Apply repair function to offspring, to keep user's initial rated movies static
         for child in offspring:
-            mask_matrix(child, user)
+            repair_individual(child, user)
 
-        # Evaluate the individuals with an invalid fitness
-        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-        fitnesses = map(toolbox.evaluate, invalid_ind)
-        for ind, fit in zip(invalid_ind, fitnesses):
+        invalid_individuals = [individual for individual in offspring if not individual.fitness.valid]
+        invalid_individuals_fits = list(map(toolbox.evaluate, invalid_individuals))
+        for ind, fit in zip(invalid_individuals, invalid_individuals_fits):
             ind.fitness.values = fit
 
-        print("  Evaluated %i individuals" % len(invalid_ind))
+        print("  Reevaluated %i offsprings with invalid fitness" % len(invalid_individuals))
 
-        # The population is entirely replaced by the offspring
         pop[:] = offspring
 
-        # Gather all the fitnesses in one list and print the stats
-        fits = [ind.fitness.values[0] for ind in pop]
+        fits = [individual.fitness.values[0] for individual in pop]
 
         elite_history.append((g, max(fits)))
-
-        length = len(pop)
-        mean = sum(fits) / length
-        sum2 = sum(x * x for x in fits)
-        std = abs(sum2 / length - mean ** 2) ** 0.5
+        mean_history.append((g, np.mean(fits)))
 
         print("  Min %s" % min(fits))
         print("  Max %s" % max(fits))
-        print("  Avg %s" % mean)
-        print("  Std %s" % std)
+        print("  Avg %s" % np.mean(fits))
 
     print("-- End of (successful) evolution --")
 
     elite = tools.selBest(pop, 1)[0]
     print("Best individual is %s, %s" % (elite, elite.fitness.values))
 
-    show_plot(elite_history, 'Generations', 'Evaluation', 'Title', '', save=False)
+    show_plot(mean_history, 'Generations', 'Evaluation', 'Title', '', save=False)
 
 
 if __name__ == "__main__":
