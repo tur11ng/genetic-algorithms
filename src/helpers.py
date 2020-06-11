@@ -20,15 +20,6 @@ def replace_nan_with_mean_columns(matrix: np.ndarray) -> np.ndarray:
     return matrix
 
 
-# def get_nearest_neighbors(individuals: np.ndarray, individual: int, n_neighbors) -> np.ndarray:
-#     individuals = np.copy(individuals)
-#     knn = NearestNeighbors(n_neighbors=n_neighbors+1, algorithm='kd_tree')
-#     knn.fit(individuals)
-#     distances, indices = knn.kneighbors(individuals)
-#     nearest_neighbors_ind = indices[individual][1:]
-#     return individuals[nearest_neighbors_ind, :]
-
-
 def get_nearest_neighbors(individuals: np.ndarray, individual: int, n_neighbors: int,
                           metric=lambda x, y: (pearsonr(x, y)[0]+1)/2) -> np.ndarray:
     individuals = np.copy(individuals)
@@ -42,19 +33,33 @@ def get_nearest_neighbors(individuals: np.ndarray, individual: int, n_neighbors:
     return individuals[sorted_distances_ind]
 
 
-# def mask_matrix(matrix: np.ndarray, mask_matrix: np.ndarray):
-#     matrix = np.copy(matrix)
-#     mask_matrix = np.copy(mask_matrix)
-#
-#     matrix[~np.isnan(mask_matrix)] = mask_matrix[~np.isnan(mask_matrix)]
-#     return matrix
+def repair_individuals(individuals: list, user: list):
+    for individual in individuals:
+        for i in range(len(individual)):
+            if not math.isnan(user[i]):
+                individual[i] = user[i]
 
 
-def repair_individual(individual: list, mask: list):
-    for i in range(len(individual)):
-        if not math.isnan(mask[i]):
-            individual[i] = mask[i]
-            # del individual.fitness.values
+def replace_invalid_individuals_with_random(individuals: list, user: list):
+    for individual_ind in range(len(individuals)):
+        if is_individual_valid(individuals[individual_ind], user):
+            for replacer_ind in np.random.permutation(len(individuals)):
+                if is_individual_valid(individuals[replacer_ind], user):
+                    individuals[individual_ind] = individuals[replacer_ind]
+
+
+def replace_invalid_individuals_with_elite(individuals: list, user: list, elite: list):
+    for individual_ind in range(len(individuals)):
+        if is_individual_valid(individuals[individual_ind], user):
+            individuals[individual_ind] = elite
+
+
+def is_individual_valid(individual: list, user: list):
+    for i, j in zip(individual, user):
+        if not math.isnan(j) and i != j:
+            return False
+    return True
+
 
 
 def show_plot(points, x_label, y_label, title, legend, save=True):
