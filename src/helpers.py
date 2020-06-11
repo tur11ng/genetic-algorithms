@@ -28,7 +28,7 @@ def get_nearest_neighbors(individuals: np.ndarray, individual: int, n_neighbors:
     for i in range(individuals.shape[0]):
         distances.append(metric(individual, individuals[i]))
 
-    sorted_distances_ind = np.argsort(np.array(distances))[-11:-1]
+    sorted_distances_ind = np.argsort(np.array(distances))[-n_neighbors - 1:-1]
     sorted_distances_ind = sorted_distances_ind[::-1]
     return individuals[sorted_distances_ind]
 
