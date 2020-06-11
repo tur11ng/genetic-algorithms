@@ -21,7 +21,7 @@ def replace_nan_with_mean_columns(matrix: np.ndarray) -> np.ndarray:
 
 
 def get_nearest_neighbors(individuals: np.ndarray, individual: int, n_neighbors: int,
-                          metric=lambda x, y: (pearsonr(x, y)[0]+1)/2) -> np.ndarray:
+                          metric=lambda x, y: pearsonr(x, y)[0]) -> np.ndarray:
     individuals = np.copy(individuals)
     individual = np.copy(individuals[individual])
     distances = []
@@ -90,7 +90,7 @@ def show_plot(plots, x_label: str, y_label: str, title: str, legend: list, param
 
 
 # Evaluation function with default metric set to normalized pearson correlation (ρ)
-def evaluation_function(individual, neighbors, metric=lambda x, y: (pearsonr(x, y)[0] + 1) / 2):
+def evaluation_function(individual, neighbors, metric=lambda x, y: pearsonr(x, y)[0]):
     distances_from_every_neighbor = []
     for neighbor in neighbors:
         distances_from_every_neighbor.append(metric(neighbor, individual))
