@@ -61,17 +61,31 @@ def is_individual_valid(individual: list, user: list):
     return True
 
 
+def show_plot(plots, x_label: str, y_label: str, title: str, legend: list, params: dict, save=True):
+    fig, ax = plt.subplots()
 
-def show_plot(points, x_label, y_label, title, legend, save=True):
-    plt.plot([point[0] for point in points], [point[1] for point in points])
+    for plot in plots:
+        plt.plot([point[0] for point in plot], [point[1] for point in plot])
     plt.xlabel(x_label)
     plt.ylabel(y_label)
+
+    textstr = (
+        r'POPULATION_SIZE=%d' % (params['POPULATION_SIZE'],),
+        r'MAX_GENERATIONS=%d' % (params['MAX_GENERATIONS'],),
+        r'P_CROSSOVER=%.3f' % (params['P_CROSSOVER'],),
+        r'P_MUTATION=%.3f' % (params['P_MUTATION'],),
+    )
+
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+
+    ax.text(0.95, 0.05, '\n'.join(textstr), transform=ax.transAxes, fontsize=12,
+            verticalalignment='bottom', horizontalalignment='right', bbox=props)
 
     plt.title("{}".format(title))
     plt.legend(legend)
     plt.show()
     if save:
-        plt.savefig("./images/{}.png".format(title), bbox_inches='tight')
+        fig.savefig("./images/{}.png".format(''.join(textstr)), bbox_inches='tight')
     plt.close()
 
 
