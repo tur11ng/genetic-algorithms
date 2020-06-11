@@ -25,11 +25,11 @@ class TestHelpers(unittest.TestCase):
         pass
 
     def test_repair_individual(self):
-        provided = [1, 2, 3, 4]
+        provided = [[1, 2, 3, 4]]
         provided_mask = [100, 200, float('NaN'), float('NaN')]
 
-        expected = [100, 200, 3, 4]
-        repair_individual(provided, provided_mask)
+        expected = [[100, 200, 3, 4]]
+        repair_individuals(provided, provided_mask)
         assert_array_equal(provided, expected)
 
     def test_evaluation_function(self):
