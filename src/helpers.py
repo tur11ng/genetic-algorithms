@@ -9,7 +9,7 @@ def replace_nan_with_random(matrix: np.ndarray, lower=1, upper=6) -> np.ndarray:
     matrix = np.copy(matrix)
     nan_mask = np.isnan(matrix)
     matrix[nan_mask] = np.random.randint(lower, upper, size=np.count_nonzero(nan_mask))
-    return matrix
+    return matrix.astype(int)
 
 
 def replace_nan_with_mean_columns(matrix: np.ndarray) -> np.ndarray:
@@ -82,7 +82,7 @@ def show_plot(plots, x_label: str, y_label: str, title: str, legend: list, param
             verticalalignment='bottom', horizontalalignment='right', bbox=props)
 
     plt.title("{}".format(title))
-    plt.legend(legend)
+    plt.legend(legend, loc='upper left')
     plt.show()
     if save:
         fig.savefig("./images/{}.png".format(''.join(textstr)), bbox_inches='tight')
